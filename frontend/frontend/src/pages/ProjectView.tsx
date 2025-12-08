@@ -9,8 +9,8 @@ export default function ProjectView() {
   const [epics, setEpics] = useState([]);
 
   useEffect(() => {
-    api.get(`/projects/${id}`).then(res => setProject(res.data));
-    api.get(`/projects/${id}/epics`).then(res => setEpics(res.data));
+    api.get(`/projects/${id}`).then((res) => setProject(res.data));
+    api.get(`/projects/${id}/epics`).then((res) => setEpics(res.data));
   }, [id]);
 
   async function logout() {
@@ -34,34 +34,54 @@ export default function ProjectView() {
 
       <div className="pv-bg">
         <div className="pv-card">
-
           <div className="top-bar">
-            <div className="icon-btn" onClick={() => history.back()}>←</div>
-            <div className="icon-btn" onClick={logout}>⛔</div>
+            <div className="icon-btn" onClick={() => history.back()}>
+              ←
+            </div>
+            <div className="icon-btn" onClick={logout}>
+              ⛔
+            </div>
           </div>
 
-          <h2 style={{textAlign:"center",color:"#d5b6ff"}}>
+          <h2 style={{ textAlign: "center", color: "#d5b6ff" }}>
             {project?.name}
           </h2>
 
-          {epics.map((e:any) => (
-            <div key={e.id} className="epic" onClick={() => window.location.href = `/epics/${e.id}`}>
-              <strong style={{color:"#d5b6ff"}}>📦 {e.title}</strong><br />
-              <span style={{color:"#cfc3ff"}}>{e.description}</span>
+          {epics.map((e: any) => (
+            <div
+              key={e.id}
+              className="epic"
+              onClick={() => (window.location.href = `/epics/${e.id}`)}
+            >
+              <strong style={{ color: "#d5b6ff" }}>📦 {e.title}</strong>
+              <br />
+              <span style={{ color: "#cfc3ff" }}>{e.description}</span>
             </div>
           ))}
 
           <button
-            onClick={() => window.location.href = `/projects/${id}/epics/create`}
+            onClick={() =>
+              (window.location.href = `/projects/${id}/epics/create`)
+            }
             style={{
-              marginTop:"20px",width:"100%",padding:"12px",
-              background:"linear-gradient(90deg,#6a00ff,#9a47ff)",border:"none",
-              borderRadius:"12px",color:"white",cursor:"pointer"
+              marginTop: "20px",
+              width: "100%",
+              padding: "12px",
+              background: "linear-gradient(90deg,#6a00ff,#9a47ff)",
+              border: "none",
+              borderRadius: "12px",
+              color: "white",
+              cursor: "pointer",
             }}
           >
             + Crear EPIC
           </button>
-
+          <button
+            className="epic"
+            onClick={() => (window.location.href = `/projects/${id}/artifacts`)}
+          >
+            📚 Artefactos del Proyecto
+          </button>
         </div>
       </div>
     </>

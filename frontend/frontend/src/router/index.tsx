@@ -8,6 +8,8 @@ import CreateProject from "../pages/CreateProject";
 import ProjectView from "../pages/ProjectView";
 import PhaseView from "../pages/PhaseView";
 import StoryView from "../pages/StoryView";
+import ArtifactsView from "../pages/ArtifactsView";
+
 
 // EPICS
 import CreateEpic from "../pages/CreateEpic";
@@ -41,6 +43,8 @@ export default function AppRouter() {
 
         {/* STORIES */}
         <Route path="/stories/:storyId" element={<StoryView />} />
+        <Route path="/projects/:id/artifacts" element={<ArtifactsView />} />
+
 
       </Routes>
     </BrowserRouter>
