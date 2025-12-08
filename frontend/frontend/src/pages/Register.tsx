@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { api } from "../api/axios";
 import { useNavigate } from "react-router-dom";
+import { alertSuccess, alertError } from "../utils/alerts";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -12,12 +13,12 @@ export default function Register() {
     try {
       const res = await api.post("/auth/register", { username, password });
 
-      alert(res.data.message);
+      alertSuccess(res.data.message || "Registro exitoso");
 
-      // Redirigir SIN recargar página → navegación moderna
+      // Navegación moderna
       navigate("/");
     } catch (error: any) {
-      alert(error.response?.data?.message || "Error al registrarse");
+      alertError(error.response?.data?.message || "Error al registrarse");
     }
   }
 

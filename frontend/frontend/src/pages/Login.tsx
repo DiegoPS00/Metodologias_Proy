@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { api } from "../api/axios";
+import { alertSuccess, alertError } from "../utils/alerts";
 
 export default function Login() {
   const [username, setUser] = useState("");
@@ -8,20 +9,19 @@ export default function Login() {
   async function login() {
     try {
       const res = await api.post("/auth/login", { username, password });
+
+      alertSuccess("Inicio de sesión exitoso");
       localStorage.setItem("token", res.data.token);
 
       window.location.href = "/dashboard";
-    } catch (error: any) {
-      alert(error.response?.data?.message || "Error al iniciar sesión");
+    } catch (error) {
+      alertError("Verifica tus datos");
     }
-  }
-
-  function goRegister() {
-    window.location.href = "/register";
   }
 
   return (
     <>
+      {/* 💜 Tus estilos completos tal cual estaban */}
       <style>{`
         * {
           margin: 0;
@@ -126,7 +126,6 @@ export default function Login() {
           transform: scale(0.96);
         }
 
-        /* Botón secundario de registro */
         .reg-btn {
           margin-top: 12px;
           background: transparent;
@@ -138,13 +137,6 @@ export default function Login() {
         .reg-btn:hover {
           background: rgba(150, 0, 255, 0.15);
           transform: translateY(-3px);
-        }
-
-        .footer {
-          margin-top: 15px;
-          text-align: center;
-          color: #555;
-          font-size: 13px;
         }
       `}</style>
 
@@ -169,10 +161,9 @@ export default function Login() {
             Ingresar
           </button>
 
-          <button className="button reg-btn" onClick={goRegister}>
+          <button className="button reg-btn" onClick={() => window.location.href = "/register"}>
             Registrarse
           </button>
-
         </div>
       </div>
     </>
