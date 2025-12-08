@@ -1,15 +1,25 @@
 import { useEffect, useState } from "react";
 import { api } from "../api/axios";
+import { confirmAction, alertSuccess } from "../utils/alerts";
+
+interface Project {
+  id: number;
+  name: string;
+}
 
 export default function Projects() {
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState<Project[]>([]);
 
   useEffect(() => {
     api.get("/projects/list").then((res) => setProjects(res.data));
   }, []);
 
-  function logout() {
+  async function logout() {
+    const conf = await confirmAction("¿Deseas cerrar sesión?");
+    if (!conf.isConfirmed) return;
+
     localStorage.removeItem("token");
+    alertSuccess("Sesión cerrada");
     window.location.href = "/";
   }
 
@@ -90,15 +100,29 @@ export default function Projects() {
 
           {/* ICONOS */}
           <div className="top-bar">
-            <div className="icon-btn" onClick={() => (window.location.href = "/dashboard")}>←</div>
-            <div className="icon-btn" onClick={() => (window.location.href = "/projects/create")}>+</div>
+            <div
+              className="icon-btn"
+              onClick={() => (window.location.href = "/dashboard")}
+            >
+              ←
+            </div>
+
+            <div
+              className="icon-btn"
+              onClick={() => (window.location.href = "/projects/create")}
+            >
+              +
+            </div>
+
             <div className="icon-btn" onClick={logout}>⛔</div>
           </div>
 
-          <h2 style={{ textAlign: "center", color: "#d5b6ff" }}>Mis Proyectos</h2>
+          <h2 style={{ textAlign: "center", color: "#d5b6ff" }}>
+            Mis Proyectos
+          </h2>
 
           <ul style={{ listStyle: "none", padding: 0 }}>
-            {projects.map((p: any) => (
+            {projects.map((p) => (
               <li
                 key={p.id}
                 className="pr-item"

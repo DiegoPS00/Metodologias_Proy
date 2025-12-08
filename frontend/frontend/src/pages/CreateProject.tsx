@@ -1,16 +1,31 @@
 import { useState } from "react";
 import { api } from "../api/axios";
+import { alertSuccess, alertError, confirmAction } from "../utils/alerts";
 
 export default function CreateProject() {
   const [name, setName] = useState("");
 
   async function create() {
-    await api.post("/projects/create", { name });
-    alert("Proyecto creado!");
-    window.location.href = "/projects";
+    if (!name.trim()) {
+      return alertError("El nombre del proyecto no puede estar vacío");
+    }
+
+    try {
+      await api.post("/projects/create", { name });
+
+      // 🔥 AQUÍ ESTÁ LA SOLUCIÓN
+      await alertSuccess("Proyecto creado correctamente");
+
+      window.location.href = "/projects";
+    } catch (err) {
+      alertError("Error al crear el proyecto");
+    }
   }
 
-  function logout() {
+  async function logout() {
+    const conf = await confirmAction("¿Deseas cerrar sesión?");
+    if (!conf.isConfirmed) return;
+
     localStorage.removeItem("token");
     window.location.href = "/";
   }
