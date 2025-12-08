@@ -1,114 +1,126 @@
 export default function Dashboard() {
+  function logout() {
+    localStorage.removeItem("token");
+    window.location.href = "/";
+  }
+
   return (
     <>
       <style>{`
-        .dash-bg {
+        body {
+          background: #0a0a0a;
+          margin: 0;
+          font-family: 'Segoe UI', sans-serif;
+        }
+
+        .container {
           width: 100vw;
           height: 100vh;
           display: flex;
-          justify-content: center;
+          flex-direction: column;
           align-items: center;
-          background: radial-gradient(circle at 50% 20%, #2d0052 0%, #000 70%);
-          animation: fadeBg 1.5s ease forwards;
+          padding-top: 80px;
+          background: radial-gradient(circle at 50% 0%, #3a0066 0%, #000 70%);
+          color: #eee;
+          animation: fade 1s ease;
         }
 
-        @keyframes fadeBg {
+        @keyframes fade {
           from { opacity: 0; }
           to { opacity: 1; }
         }
 
-        .dash-card {
-          width: 420px;
-          padding: 40px;
-          border-radius: 18px;
-          background: rgba(15, 15, 15, 0.75);
-          backdrop-filter: blur(20px);
-          border: 1px solid rgba(255, 255, 255, 0.05);
-          box-shadow: 0 0 25px rgba(130, 0, 255, 0.25);
-          text-align: center;
-          animation: slideUp 0.8s ease forwards;
-          opacity: 0;
-          transform: translateY(40px);
-        }
-
-        @keyframes slideUp {
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .dash-title {
-          color: #c58aff;
-          font-size: 30px;
-          margin-bottom: 25px;
+        .title {
+          font-size: 36px;
           font-weight: 700;
-          text-shadow: 0 0 12px rgba(180, 0, 255, 0.5);
+          margin-bottom: 30px;
+          letter-spacing: 1px;
+          color: #e9d4ff;
         }
 
-        .dash-link {
-          display: block;
-          margin: 12px 0;
-          padding: 12px;
-          color: #d8c8ff;
-          font-size: 18px;
-          text-decoration: none;
-          border-radius: 10px;
-          background: #111;
-          border: 1px solid #333;
-          transition: .25s ease;
+        /* Tarjetas */
+        .cards {
+          display: flex;
+          gap: 25px;
         }
 
-        .dash-link:hover {
-          background: #1a1a1a;
-          border-color: #8e37ff;
-          box-shadow: 0 0 12px #8e37ff55;
-          transform: scale(1.03);
-        }
-
-        .logout-btn {
-          width: 100%;
-          margin-top: 20px;
-          padding: 14px;
-          font-size: 17px;
-          border: none;
-          border-radius: 12px;
+        .card {
+          width: 230px;
+          height: 140px;
+          background: rgba(255, 255, 255, 0.07);
+          border-radius: 18px;
+          padding: 20px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          backdrop-filter: blur(14px);
           cursor: pointer;
-          background: #ef4444;
-          color: #fff;
+          transition: 0.25s ease;
+        }
+
+        .card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 0 25px rgba(140, 0, 255, 0.35);
+          border-color: #9f4dff;
+        }
+
+        .card-icon {
+          font-size: 32px;
+          opacity: 0.9;
+        }
+
+        .card-text {
+          font-size: 18px;
           font-weight: 600;
-          transition: .25s ease;
-          box-shadow: 0 0 18px #ff2b2b55;
+          color: #f1e8ff;
         }
 
-        .logout-btn:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 0 28px #ff2b2baa;
+        /* Logout */
+        .logout {
+          margin-top: 50px;
+          padding: 12px 25px;
+          font-size: 17px;
+          background: #c62828;
+          color: white;
+          border-radius: 10px;
+          border: none;
+          cursor: pointer;
+          transition: 0.25s;
         }
 
-        .logout-btn:active {
-          transform: scale(0.96);
+        .logout:hover {
+          background: #ff4343;
         }
+
       `}</style>
 
-      <div className="dash-bg">
-        <div className="dash-card">
-          <h1 className="dash-title">Panel de Control</h1>
+      <div className="container">
+        <h1 className="title">Panel Principal</h1>
 
-          <a href="/projects" className="dash-link">📁 Ver proyectos</a>
+        <div className="cards">
 
-          <a href="/projects/create" className="dash-link">➕ Crear proyecto</a>
-
-          <button
-            className="logout-btn"
-            onClick={() => {
-              localStorage.removeItem("token");
-              window.location.href = "/";
-            }}
+          <div
+            className="card"
+            onClick={() => window.location.href = "/projects"}
           >
-            Cerrar sesión
-          </button>
+            <div className="card-icon">📁</div>
+            <div className="card-text">Mis proyectos</div>
+          </div>
+
+          <div
+            className="card"
+            onClick={() => window.location.href = "/projects/create"}
+          >
+            <div className="card-icon">➕</div>
+            <div className="card-text">Nuevo proyecto</div>
+          </div>
+
         </div>
+
+        <button className="logout" onClick={logout}>
+          Cerrar sesión
+        </button>
       </div>
     </>
   );
