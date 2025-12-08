@@ -1,23 +1,28 @@
 import { useState } from "react";
 import { api } from "../api/axios";
+import { useNavigate } from "react-router-dom";
 
-export default function Login() {
+export default function Register() {
+  const navigate = useNavigate();
+
   const [username, setUser] = useState("");
   const [password, setPass] = useState("");
 
-  async function login() {
+  async function register() {
     try {
-      const res = await api.post("/auth/login", { username, password });
-      localStorage.setItem("token", res.data.token);
+      const res = await api.post("/auth/register", { username, password });
 
-      window.location.href = "/dashboard";
+      alert(res.data.message);
+
+      // Redirigir SIN recargar página → navegación moderna
+      navigate("/");
     } catch (error: any) {
-      alert(error.response?.data?.message || "Error al iniciar sesión");
+      alert(error.response?.data?.message || "Error al registrarse");
     }
   }
 
-  function goRegister() {
-    window.location.href = "/register";
+  function goLogin() {
+    navigate("/");
   }
 
   return (
@@ -41,12 +46,6 @@ export default function Login() {
           justify-content: center;
           align-items: center;
           background: radial-gradient(circle at 50% 20%, #3a0066 0%, #000 70%);
-          animation: fadeBg 1.5s ease forwards;
-        }
-
-        @keyframes fadeBg {
-          from { opacity: 0; }
-          to { opacity: 1; }
         }
 
         .card {
@@ -57,16 +56,6 @@ export default function Login() {
           border: 1px solid rgba(255, 255, 255, 0.05);
           border-radius: 18px;
           box-shadow: 0 0 25px rgba(130, 0, 255, 0.2);
-          animation: slideUp 0.7s ease forwards;
-          opacity: 0;
-          transform: translateY(40px);
-        }
-
-        @keyframes slideUp {
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
         }
 
         .title {
@@ -99,7 +88,6 @@ export default function Login() {
           border-color: #8e37ff;
           box-shadow: 0 0 12px #8e37ff55;
           background: #0d0d0d;
-          transform: scale(1.03);
         }
 
         .button {
@@ -126,31 +114,22 @@ export default function Login() {
           transform: scale(0.96);
         }
 
-        /* Botón secundario de registro */
-        .reg-btn {
+        .login-btn {
           margin-top: 12px;
           background: transparent;
           border: 1px solid #9c4dff;
           color: #d3b2ff;
-          box-shadow: none;
         }
 
-        .reg-btn:hover {
+        .login-btn:hover {
           background: rgba(150, 0, 255, 0.15);
           transform: translateY(-3px);
-        }
-
-        .footer {
-          margin-top: 15px;
-          text-align: center;
-          color: #555;
-          font-size: 13px;
         }
       `}</style>
 
       <div className="bg">
         <div className="card">
-          <h2 className="title">Bienvenido</h2>
+          <h2 className="title">Crear Cuenta</h2>
 
           <input
             className="input"
@@ -165,14 +144,13 @@ export default function Login() {
             onChange={(e) => setPass(e.target.value)}
           />
 
-          <button className="button" onClick={login}>
-            Ingresar
-          </button>
-
-          <button className="button reg-btn" onClick={goRegister}>
+          <button className="button" onClick={register}>
             Registrarse
           </button>
 
+          <button className="button login-btn" onClick={goLogin}>
+            Iniciar Sesión
+          </button>
         </div>
       </div>
     </>

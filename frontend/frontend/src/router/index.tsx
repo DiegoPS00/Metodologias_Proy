@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Login from "../pages/Login";
+import Register from "../pages/Register";   // <-- FALTA ESTO
 import Dashboard from "../pages/Dashboard";
 import Projects from "../pages/Projects";
 import CreateProject from "../pages/CreateProject";
@@ -15,6 +16,9 @@ export default function AppRouter() {
         {/* LOGIN */}
         <Route path="/" element={<Login />} />
 
+        {/* REGISTER */}
+        <Route path="/register" element={<Register />} />   {/* <-- FALTA */}
+
         {/* DASHBOARD */}
         <Route path="/dashboard" element={<Dashboard />} />
 
@@ -22,7 +26,7 @@ export default function AppRouter() {
         <Route path="/projects" element={<Projects />} />
         <Route path="/projects/create" element={<CreateProject />} />
 
-        {/* NEW ROUTES (NECESSARY) */}
+        {/* NEW ROUTES */}
         <Route path="/projects/:id" element={<ProjectView />} />
         <Route path="/projects/:id/phases/:phaseId" element={<PhaseView />} />
         <Route path="/stories/:storyId" element={<StoryView />} />
