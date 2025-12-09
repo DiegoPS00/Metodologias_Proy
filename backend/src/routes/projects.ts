@@ -80,3 +80,66 @@ routerProjects.post("/:id/epics/create", verifyToken, async (req: any, res) => {
 
   res.json({ message: "Epic creado correctamente" });
 });
+routerProjects.patch("/:id/archive", verifyToken, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await db.query(
+      "UPDATE projects SET archived = 1 WHERE id = ?",
+      [id]
+    );
+
+    res.json({ message: "Proyecto archivado" });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "No se pudo archivar el proyecto" });
+  }
+});
+routerProjects.delete("/:id", verifyToken, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await db.query("DELETE FROM artifacts WHERE project_id = ?", [id]);
+    await db.query("DELETE FROM backlog WHERE project_id = ?", [id]);
+    await db.query("DELETE FROM epics WHERE project_id = ?", [id]);
+    await db.query("DELETE FROM projects WHERE id = ?", [id]);
+
+    res.json({ message: "Proyecto eliminado definitivamente" });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "No se pudo eliminar el proyecto" });
+  }
+});
+
+// Obtener proyectos archivados
+routerProjects.get("/archived/list", verifyToken, async (req, res) => {
+  try {
+    const [rows]: any = await db.query(
+      "SELECT id, name, archived FROM projects WHERE archived = 1 ORDER BY id DESC"
+    );
+
+    res.json(rows);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Error obteniendo proyectos archivados" });
+  }
+});
+// Restaurar proyecto archivado
+routerProjects.patch("/:id/restore", verifyToken, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await db.query(
+      "UPDATE projects SET archived = 0 WHERE id = ?",
+      [id]
+    );
+
+    res.json({ message: "Proyecto restaurado" });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "No se pudo restaurar el proyecto" });
+  }
+});

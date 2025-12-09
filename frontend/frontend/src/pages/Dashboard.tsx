@@ -52,29 +52,24 @@ export default function Dashboard() {
               onClick={() => window.location.href="/projects/create"}
             />
 
-            <DashboardCard 
-              icon="📝"
-              text="Backlog"
-              onClick={() => window.location.href="/backlog"}
-            />
-
+           
             <DashboardCard 
               icon="📌"
               text="Board (Kanban)"
               onClick={() => window.location.href="/board"}
             />
 
-            <DashboardCard 
-              icon="⏱"
-              text="Iteraciones"
-              onClick={() => window.location.href="/iterations"}
-            />
+          
 
             <DashboardCard 
               icon="📚"
               text="Artefactos"
               onClick={() => window.location.href="/artifacts"}
-            />
+            /><DashboardCard
+  icon="🧪"
+  text="Pruebas Unitarias"
+  onClick={() => (window.location.href = "/tests")}
+ />
 
             <DashboardCard 
               icon="📊"

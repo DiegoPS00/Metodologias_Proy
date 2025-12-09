@@ -9,8 +9,11 @@ export default function ArtifactsView() {
   const { id } = useParams(); // project_id
   const [phase, setPhase] = useState("Inception");
   const [artifacts, setArtifacts] = useState<any[]>([]);
+
   const [title, setTitle] = useState("");
   const [description, setDesc] = useState("");
+  const [changeNotes, setChangeNotes] = useState("");
+  const [version, setVersion] = useState(1);
 
   async function load() {
     const res = await api.get(`/projects/${id}/artifacts/${phase}`);
@@ -18,21 +21,28 @@ export default function ArtifactsView() {
   }
 
   async function add() {
-    if (!title.trim()) return alertError("El nombre del artefacto es obligatorio");
+    if (!title.trim())
+      return alertError("El nombre del artefacto es obligatorio");
 
     try {
       await api.post(`/projects/${id}/artifacts`, {
         phase_name: phase,
         title,
         description,
+        change_notes: changeNotes,
+        version,
       });
 
       alertSuccess("Artefacto registrado");
       setTitle("");
       setDesc("");
+      setChangeNotes("");
+      setVersion(1);
+
       load();
-    } catch {
-      alertError("Error al registrar artefacto");
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || "Error al registrar artefacto";
+      alertError(msg);
     }
   }
 
@@ -136,6 +146,15 @@ export default function ArtifactsView() {
             onChange={(e) => setTitle(e.target.value)}
           />
 
+          <input
+            className="input"
+            type="number"
+            min={1}
+            placeholder="Versión (ej. 1)"
+            value={version}
+            onChange={(e) => setVersion(Number(e.target.value))}
+          />
+
           <textarea
             className="input"
             placeholder="Descripción (opcional)"
@@ -144,7 +163,17 @@ export default function ArtifactsView() {
             rows={3}
           />
 
-          <button className="btn" onClick={add}>➕ Agregar artefacto</button>
+          <textarea
+            className="input"
+            placeholder="Notas de cambio (opcional)"
+            value={changeNotes}
+            onChange={(e) => setChangeNotes(e.target.value)}
+            rows={3}
+          />
+
+          <button className="btn" onClick={add}>
+            ➕ Agregar artefacto
+          </button>
 
           <hr style={{ margin: "25px 0", borderColor: "#333" }} />
 
@@ -153,8 +182,22 @@ export default function ArtifactsView() {
           {artifacts.map((a) => (
             <div className="artifact" key={a.id}>
               <strong style={{ color: "#d5b6ff" }}>{a.title}</strong>
-              <br />
-              <small style={{ color: "#bfaaff" }}>{a.description}</small>
+
+              <p style={{ color: "#bfaaff", marginTop: "4px" }}>
+                <b>Versión:</b> {a.version}
+              </p>
+
+              {a.description && (
+                <small style={{ color: "#bfaaff" }}>
+                  {a.description}
+                </small>
+              )}
+
+              {a.change_notes && (
+                <p style={{ color: "#9d80ff", marginTop: "8px" }}>
+                  <b>Notas de cambio:</b> {a.change_notes}
+                </p>
+              )}
             </div>
           ))}
         </div>

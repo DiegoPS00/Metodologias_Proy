@@ -140,6 +140,7 @@ export default function ProjectView() {
 
       <div className="pv-bg">
         <div className="pv-card">
+
           {/* TOP BAR */}
           <div className="top-bar">
             <div className="icon-btn" onClick={() => history.back()}>
@@ -178,13 +179,34 @@ export default function ProjectView() {
             + Crear EPIC
           </button>
 
-          {/* SECONDARY BUTTON */}
+          {/* ARTEFACTOS BUTTON */}
           <button
             className="secondary-btn"
             onClick={() => (window.location.href = `/projects/${id}/artifacts`)}
           >
             📚 Artefactos del Proyecto
           </button>
+
+          {/* BACKLOG BUTTON — NUEVO */}
+          <button
+            className="secondary-btn"
+            onClick={() => (window.location.href = `/projects/${id}/backlog`)}
+          >
+            📝 Ver Backlog del Proyecto
+          </button>
+<button
+  className="secondary-btn"
+  onClick={() => (window.location.href = `/projects/${id}/plan`)}
+>
+  📘 Plan del Proyecto
+</button>
+<button
+  className="btn-secondary"
+  onClick={() => (window.location.href = `/projects/${id}/iteraciones`)}
+>
+  ⏱ Iteraciones
+</button>
+
         </div>
       </div>
     </>

@@ -1,17 +1,25 @@
 import { useEffect, useState } from "react";
 import { api } from "../api/axios";
-import { confirmAction, alertSuccess } from "../utils/alerts";
+import { confirmAction, alertSuccess, alertError } from "../utils/alerts";
 
 interface Project {
   id: number;
   name: string;
+  archived: number;
 }
 
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
 
+  async function load() {
+    api.get("/projects/list").then((res) => {
+      // Solo mostrar proyectos NO archivados
+      setProjects(res.data.filter((p: Project) => p.archived === 0));
+    });
+  }
+
   useEffect(() => {
-    api.get("/projects/list").then((res) => setProjects(res.data));
+    load();
   }, []);
 
   async function logout() {
@@ -21,6 +29,32 @@ export default function Projects() {
     localStorage.removeItem("token");
     alertSuccess("Sesión cerrada");
     window.location.href = "/";
+  }
+
+  async function archiveProject(id: number) {
+    const conf = await confirmAction("¿Archivar este proyecto?");
+    if (!conf.isConfirmed) return;
+
+    try {
+      await api.patch(`/projects/${id}/archive`);
+      alertSuccess("Proyecto archivado");
+      load();
+    } catch {
+      alertError("No se pudo archivar");
+    }
+  }
+
+  async function deleteProject(id: number) {
+    const conf = await confirmAction("¿Eliminar definitivamente este proyecto? Esta acción NO se puede deshacer.");
+    if (!conf.isConfirmed) return;
+
+    try {
+      await api.delete(`/projects/${id}`);
+      alertSuccess("Proyecto eliminado");
+      load();
+    } catch {
+      alertError("No se pudo eliminar el proyecto");
+    }
   }
 
   return (
@@ -85,6 +119,9 @@ export default function Projects() {
           border-radius: 12px;
           cursor: pointer;
           transition: .25s ease;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
         }
 
         .pr-item:hover {
@@ -93,6 +130,38 @@ export default function Projects() {
           transform: scale(1.03);
           box-shadow: 0 0 12px #8e37ff55;
         }
+
+        .actions {
+          display: flex;
+          gap: 12px;
+        }
+
+        .action-btn {
+          background: transparent;
+          border: none;
+          font-size: 20px;
+          cursor: pointer;
+          transition: .2s;
+        }
+
+        .archive-btn {
+          color: #ffdd55;
+        }
+
+        .archive-btn:hover {
+          color: #ffcc00;
+          transform: scale(1.2);
+        }
+
+        .delete-btn {
+          color: #ff5e5e;
+        }
+
+        .delete-btn:hover {
+          color: #ff1f1f;
+          transform: scale(1.2);
+        }
+
       `}</style>
 
       <div className="pr-bg">
@@ -113,6 +182,12 @@ export default function Projects() {
             >
               +
             </div>
+<div
+  className="icon-btn"
+  onClick={() => (window.location.href = "/projects/archived")}
+>
+  🗄
+</div>
 
             <div className="icon-btn" onClick={logout}>⛔</div>
           </div>
@@ -122,16 +197,44 @@ export default function Projects() {
           </h2>
 
           <ul style={{ listStyle: "none", padding: 0 }}>
-            {projects.map((p) => (
-              <li
-                key={p.id}
-                className="pr-item"
-                onClick={() => (window.location.href = `/projects/${p.id}`)}
-              >
-                📁 {p.name}
-              </li>
-            ))}
-          </ul>
+  {projects.map((p) => (
+    <li
+      key={p.id}
+      className="pr-item"
+      onClick={() => (window.location.href = `/projects/${p.id}`)}
+    >
+      {/* TEXTO DEL PROYECTO */}
+      <div>
+        📁 {p.name}
+      </div>
+
+      {/* BOTONES */}
+      <div className="actions">
+        <button
+          className="action-btn archive-btn"
+          onClick={(e) => {
+            e.stopPropagation(); // ← MUY IMPORTANTE
+            archiveProject(p.id);
+          }}
+        >
+          🗄
+        </button>
+
+        <button
+          className="action-btn delete-btn"
+          onClick={(e) => {
+            e.stopPropagation(); // ← MUY IMPORTANTE
+            deleteProject(p.id);
+          }}
+        >
+          🗑
+        </button>
+      </div>
+    </li>
+  ))}
+</ul>
+
+
         </div>
       </div>
     </>
