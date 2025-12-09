@@ -1,54 +1,61 @@
-import { Router } from "express";
-import { exec } from "child_process";
 import path from "path";
+import { exec } from "child_process";
+import fs from "fs";
 
-export const routerTests = Router();
+export async function runAllTests(): Promise<any> {
+  return new Promise((resolve) => {
+    const output = path.join(__dirname, "../../test-results.json");
 
-routerTests.get("/tests/run", (req, res) => {
-  console.log("🔥 Ejecutando pruebas unitarias...");
+    // Borrar archivo previo
+    if (fs.existsSync(output)) fs.unlinkSync(output);
 
-  const outputFile = path.join(__dirname, "../../test-results.json");
+    const cmd = `npm test -- --json --outputFile="${output}" --passWithNoTests`;
 
-  const command = `npm test -- --json --outputFile="${outputFile}"`;
+    console.log("🔥 Ejecutando Jest:", cmd);
 
-  console.log("📌 Ejecutando comando:", command);
+    exec(cmd, { cwd: path.join(__dirname, "../../") }, (err, stdout, stderr) => {
+      console.log("📌 STDOUT:", stdout);
+      console.log("📌 STDERR:", stderr);
 
-  exec(command, (error, stdout, stderr) => {
-    console.log("📌 STDOUT:", stdout);
-    console.log("📌 STDERR:", stderr);
+      if (err) {
+        return resolve({
+          success: false,
+          message: "Error ejecutando Jest",
+          error: stderr || err.message,
+        });
+      }
 
-    if (error) {
-      console.error("❌ Error ejecutando pruebas:", error);
-      return res.status(500).json({
-        success: false,
-        message: "Error ejecutando Jest",
-        error: stderr || error.message,
-      });
-    }
+      if (!fs.existsSync(output)) {
+        return resolve({
+          success: false,
+          message: "No se pudo generar test-results.json",
+        });
+      }
 
-    try {
-      console.log("📌 Leyendo archivo de resultados:", outputFile);
+      try {
+        const txt = fs.readFileSync(output, "utf8");
+        const json = JSON.parse(txt);
 
-      delete require.cache[require.resolve("../../test-results.json")];
-      const results = require("../../test-results.json");
+        const tests = json.testResults.map((t: any) => ({
+          name: t.name,
+          success: t.status === "passed",
+          error: t.failureMessage || null,
+        }));
 
-      const formatted = results.testResults.map((t: any) => ({
-        name: t.name,
-        success: t.status === "passed",
-        error: t.failureMessage || null,
-      }));
-
-      return res.json({
-        success: true,
-        tests: formatted,
-      });
-
-    } catch (err) {
-      console.error("❌ Error leyendo test-results.json:", err);
-      return res.status(500).json({
-        success: false,
-        message: "No se pudieron leer los resultados",
-      });
-    }
+        resolve({
+          success: true,
+          total: tests.length,
+          passed: tests.filter((t) => t.success).length,
+          failed: tests.filter((t) => !t.success).length,
+          tests,
+        });
+      } catch (err) {
+        resolve({
+          success: false,
+          message: "Error leyendo resultados",
+          error: `${err}`,
+        });
+      }
+    });
   });
-});
+}

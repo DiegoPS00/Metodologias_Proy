@@ -7,7 +7,7 @@ import { routerArtifacts } from "./routes/artifacts";
 import routerBacklog from "./routes/backlog";
 import { routerPlan } from "./routes/plan";
 import { routerIteraciones } from "./routes/iteraciones";
-import { routerTests } from "./routes/tests";
+import { runAllTests } from "./routes/tests";
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -19,7 +19,8 @@ app.use(routerArtifacts);
 app.use(routerBacklog);
 app.use(routerPlan);
 app.use(routerIteraciones);
-app.use("/", routerTests);
+app.use("/", runAllTests);
+export default app;
 app.listen(3001, () => {
   console.log("🔥 Backend escuchando en http://localhost:3001");
 });

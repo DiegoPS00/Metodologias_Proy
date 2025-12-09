@@ -61,11 +61,8 @@ export default function Dashboard() {
 
           
 
-            <DashboardCard 
-              icon="📚"
-              text="Artefactos"
-              onClick={() => window.location.href="/artifacts"}
-            /><DashboardCard
+            
+            <DashboardCard
   icon="🧪"
   text="Pruebas Unitarias"
   onClick={() => (window.location.href = "/tests")}
