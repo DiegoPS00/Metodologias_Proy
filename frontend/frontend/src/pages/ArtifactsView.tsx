@@ -53,66 +53,84 @@ export default function ArtifactsView() {
   return (
     <>
       <style>{`
-        .artifacts-bg {
-          width: 100vw;
-          height: 100vh;
-          background: #0f0f0f;
-          display: flex;
-          justify-content: center;
-          padding-top: 40px;
-        }
-        .card {
-          width: 900px;
-          background: #1c1c1c;
-          padding: 20px;
-          border-radius: 12px;
-          color: white;
-          box-shadow: 0 0 20px #0006;
-        }
-        .tabs {
-          display: flex;
-          gap: 10px;
-          margin-bottom: 20px;
-        }
-        .tab {
-          padding: 10px 18px;
-          border-radius: 8px;
-          background: #2a2a2a;
-          cursor: pointer;
-          transition: .2s;
-        }
-        .tab.active {
-          background: #7a3cff;
-          font-weight: bold;
-        }
-        .artifact {
-          background: #222;
-          padding: 15px;
-          border-radius: 10px;
-          margin-bottom: 12px;
-          border: 1px solid #333;
-        }
-        .input {
-          width: 100%;
-          padding: 10px;
-          margin-bottom: 10px;
-          border-radius: 8px;
-          background: #111;
-          border: 1px solid #333;
-          color: white;
-        }
-        .btn {
-          width: 100%;
-          padding: 12px;
-          background: linear-gradient(90deg,#7a3cff,#9a63ff);
-          border: none;
-          border-radius: 10px;
-          cursor: pointer;
-          margin-top: 10px;
-          color: white;
-          font-weight: bold;
-        }
-      `}</style>
+  .artifacts-bg {
+    width: 100vw;
+    height: 100vh;
+    background: #0f0f0f;
+    display: flex;
+    justify-content: center;
+    padding-top: 40px;
+  }
+  .card {
+    width: 900px;
+    background: #1c1c1c;
+    padding: 20px;
+    border-radius: 12px;
+    color: white;
+    box-shadow: 0 0 20px #0006;
+  }
+  .tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .tab {
+    padding: 10px 18px;
+    border-radius: 8px;
+    background: #2a2a2a;
+    cursor: pointer;
+    transition: .2s;
+  }
+  .tab.active {
+    background: #7a3cff;
+    font-weight: bold;
+  }
+  .artifact {
+    background: #222;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #333;
+  }
+  .input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    background: #111;
+    border: 1px solid #333;
+    color: white;
+  }
+  .btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(90deg,#7a3cff,#9a63ff);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 10px;
+    color: white;
+    font-weight: bold;
+  }
+
+  /* 🔥 Nueva clase requerida */
+  .secondary-btn {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: #333;
+    border: 1px solid #555;
+    border-radius: 8px;
+    color: #d5b6ff;
+    cursor: pointer;
+    transition: .25s;
+  }
+  .secondary-btn:hover {
+    background: #444;
+    transform: translateY(-2px);
+    border-color: #7a3cff;
+  }
+`}</style>
+
 
       <div className="artifacts-bg">
         <div className="card">
@@ -174,32 +192,41 @@ export default function ArtifactsView() {
           <button className="btn" onClick={add}>
             ➕ Agregar artefacto
           </button>
-
+            
           <hr style={{ margin: "25px 0", borderColor: "#333" }} />
 
           <h3 style={{ color: "#c9a7ff" }}>Artefactos registrados</h3>
 
           {artifacts.map((a) => (
-            <div className="artifact" key={a.id}>
-              <strong style={{ color: "#d5b6ff" }}>{a.title}</strong>
+  <div className="artifact" key={a.id}>
+    <strong style={{ color: "#d5b6ff" }}>{a.title}</strong>
 
-              <p style={{ color: "#bfaaff", marginTop: "4px" }}>
-                <b>Versión:</b> {a.version}
-              </p>
+    <p style={{ color: "#bfaaff", marginTop: "4px" }}>
+      <b>Versión:</b> {a.version}
+    </p>
 
-              {a.description && (
-                <small style={{ color: "#bfaaff" }}>
-                  {a.description}
-                </small>
-              )}
+    {/* BOTÓN PARA VER DEFECTOS */}
+    <button
+      className="secondary-btn"
+      onClick={() => (window.location.href = `/artifact/${a.id}/defects`)}
+    >
+      ⚠ Ver Defectos
+    </button>
 
-              {a.change_notes && (
-                <p style={{ color: "#9d80ff", marginTop: "8px" }}>
-                  <b>Notas de cambio:</b> {a.change_notes}
-                </p>
-              )}
-            </div>
-          ))}
+    {a.description && (
+      <small style={{ color: "#bfaaff" }}>
+        {a.description}
+      </small>
+    )}
+
+    {a.change_notes && (
+      <p style={{ color: "#9d80ff", marginTop: "8px" }}>
+        <b>Notas de cambio:</b> {a.change_notes}
+      </p>
+    )}
+  </div>
+))}
+
         </div>
       </div>
     </>

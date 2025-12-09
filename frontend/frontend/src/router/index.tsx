@@ -17,6 +17,8 @@ import EpicDetail from "../pages/EpicDetail"; // ✔ CORRECTO
 import Iterations from "../pages/Iterations";
 import IterationView from "../pages/IterationView";
 import UnitTests from "../pages/UnitTests";
+import Microincrements from "../pages/Microincrements";
+import ArtifactDefects from "../pages/ArtifactDefects"; 
 export default function AppRouter() {
   return (
     <BrowserRouter>
@@ -43,11 +45,13 @@ export default function AppRouter() {
         <Route path="/projects/:id/epics/create" element={<CreateEpic />} />
         <Route path="/epics/:epicId" element={<EpicDetail />} /> {/* ✔ */}
 <Route path="/projects/:id/iteraciones" element={<Iterations />} />
-<Route path="/iteraciones/:itId" element={<IterationView />} />
+<Route path="/iteraciones/:id" element={<IterationView />} />
         {/* STORIES */}
         <Route path="/stories/:storyId" element={<StoryView />} />
         <Route path="/projects/:id/artifacts" element={<ArtifactsView />} />
-
+        {/* MICROINCREMENTS */}
+        <Route path="/projects/:id/microincrements" element={<Microincrements />} />
+<Route path="/artifact/:artifactId/defects" element={<ArtifactDefects />} />
 
       </Routes>
     </BrowserRouter>

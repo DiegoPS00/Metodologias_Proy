@@ -3,70 +3,91 @@ import { useParams } from "react-router-dom";
 import { api } from "../api/axios";
 import { alertSuccess, alertError } from "../utils/alerts";
 
-export default function Iterations() {
-  const { id } = useParams();
-  const [list, setList] = useState<any[]>([]);
-  const [nombre, setNombre] = useState("");
-  const [objetivo, setObjetivo] = useState("");
-  const [inicio, setInicio] = useState("");
-  const [fin, setFin] = useState("");
+export default function IterationView() {
+  const { id } = useParams(); // ID de iteración
+  const [iter, setIter] = useState<any>(null);
+  const [micros, setMicros] = useState<any[]>([]);
+
+  // form
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [progress, setProgress] = useState(0);
 
   async function load() {
-    const res = await api.get(`/projects/${id}/iteraciones`);
-    setList(res.data);
+    const info = await api.get(`/iteraciones/${id}`);
+    setIter(info.data);
+
+    const micro = await api.get(`/microincrements/iteration/${id}`);
+    setMicros(micro.data);
   }
 
-  async function crear() {
-    if (!nombre.trim()) return alertError("El nombre es obligatorio");
+async function createMicro() {
+  if (!title.trim()) return alertError("El título es obligatorio");
 
-    try {
-      await api.post(`/projects/${id}/iteraciones`, {
-        nombre,
-        objetivo,
-        fecha_inicio: inicio,
-        fecha_fin: fin,
-      });
-      alertSuccess("Iteración creada");
-      setNombre("");
-      setObjetivo("");
-      setInicio("");
-      setFin("");
-      load();
-    } catch {
-      alertError("No se pudo crear");
-    }
+  try {
+    await api.post("microincrements", {
+      project_id: iter.project_id,
+      iteration_id: Number(id),
+      title,
+      description,
+      progress,
+    });
+
+    alertSuccess("Microincremento técnico creado");
+    setTitle("");
+    setDescription("");
+    setProgress(0);
+    load();
+  } catch (err) {
+    console.error("Error creando microincremento:", err);
+    alertError("No se pudo crear");
+  }
+}
+
+
+
+  async function updateProgress(mid: number, newVal: number) {
+    await api.put(`/microincrements/${mid}/progress`, {
+      progress: newVal,
+    });
+    load();
   }
 
   useEffect(() => {
     load();
-  }, []);
+  }, [id]);
+
+  if (!iter) return <p>Cargando...</p>;
 
   return (
     <>
       <style>{`
-        .iter-bg {
+        .bg {
+          width: 100vw;
           min-height: 100vh;
+          background: radial-gradient(circle at 50% 0%, #300066 0%, #000 70%);
           padding-top: 40px;
-          background: radial-gradient(circle at 50% 0%, #3a0066 0%, #000 80%);
           display: flex;
           justify-content: center;
           color: white;
         }
 
-        .iter-card {
-          width: 750px;
+        .card {
+          width: 800px;
           background: rgba(20, 20, 20, 0.75);
+          padding: 35px;
           border-radius: 20px;
-          padding: 40px;
           border: 1px solid #2a2a2a;
-          box-shadow: 0 0 40px #7c2bff55;
-          backdrop-filter: blur(12px);
-          animation: fadeIn .4s ease-out;
+          box-shadow: 0 0 40px #7c2bff33;
+          backdrop-filter: blur(10px);
         }
 
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
+        .micro {
+          background: #141414;
+          padding: 16px;
+          margin-bottom: 12px;
+          border-radius: 12px;
+          border: 1px solid #333;
         }
 
         .input, .textarea {
@@ -74,120 +95,105 @@ export default function Iterations() {
           padding: 12px;
           background: #111;
           border: 1px solid #333;
-          border-radius: 12px;
-          margin-bottom: 12px;
-          color: #eee;
-        }
-
-        .textarea {
-          min-height: 90px;
-        }
-
-        .btn-primary {
-          width: 100%;
-          padding: 14px;
-          background: linear-gradient(90deg, #7b2fff, #b46aff);
-          border: none;
-          border-radius: 14px;
-          font-weight: bold;
-          cursor: pointer;
-          margin-top: 10px;
           color: white;
-          font-size: 16px;
-          transition: .25s;
+          margin-bottom: 10px;
+          border-radius: 10px;
         }
 
-        .btn-primary:hover {
-          opacity: .9;
-          transform: translateY(-3px);
-          box-shadow: 0 0 16px #a55cff70;
-        }
+        .textarea { min-height: 70px; }
 
-        .iter-item {
-          padding: 18px;
-          background: #1c1c1c;
-          border: 1px solid #333;
-          border-radius: 14px;
-          margin-bottom: 15px;
+        .btn {
+          width: 100%;
+          padding: 12px;
+          border-radius: 12px;
+          border: none;
           cursor: pointer;
+          background: linear-gradient(90deg,#7b2fff,#b46aff);
+          color: white;
+          font-weight: bold;
           transition: .25s;
         }
 
-        .iter-item:hover {
-          background: #242424;
-          border-color: #9d5cff;
-          transform: scale(1.03);
-          box-shadow: 0 0 18px #7a3cff55;
+        .btn:hover {
+          opacity: .9;
+          transform: translateY(-2px);
         }
 
-        .status-pill {
-          display: inline-block;
-          padding: 4px 10px;
-          background: #7b2fff44;
-          border-radius: 8px;
-          font-size: 12px;
-          color: #d8c2ff;
-          border: 1px solid #7b2fff88;
-          margin-top: 5px;
-        }
       `}</style>
 
-      <div className="iter-bg">
-        <div className="iter-card">
+      <div className="bg">
+        <div className="card">
 
-          <h1 style={{ textAlign: "center", color: "#e1c9ff", marginBottom: 25 }}>
-            ⏱ Iteraciones
-          </h1>
+          <button
+            className="btn"
+            style={{ marginBottom: 20, background: "#1c1c1c" }}
+            onClick={() => history.back()}
+          >
+            ← Volver
+          </button>
 
-          {/* FORM */}
+          <h2 style={{ textAlign: "center", marginBottom: 20 }}>
+            ⏱ Iteración: {iter.nombre}
+          </h2>
+
+          <p style={{ color: "#cfc3ff" }}>{iter.objetivo}</p>
+
+          <hr style={{ margin: "25px 0" }} />
+
+          <h3 style={{ color: "#d5b6ff" }}>⚡ Microincrementos Técnicos</h3>
+
+          {/* FORM CREAR */}
           <input
             className="input"
-            placeholder="Nombre"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
+            placeholder="Título del microincremento técnico"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
           />
 
           <textarea
             className="textarea"
-            placeholder="Objetivo"
-            value={objetivo}
-            onChange={(e) => setObjetivo(e.target.value)}
+            placeholder="Descripción (opcional)"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
           />
 
+          <label>Progreso inicial: {progress}%</label>
           <input
-            type="date"
-            className="input"
-            value={inicio}
-            onChange={(e) => setInicio(e.target.value)}
+            type="range"
+            min={0}
+            max={100}
+            value={progress}
+            onChange={(e) => setProgress(Number(e.target.value))}
           />
 
-          <input
-            type="date"
-            className="input"
-            value={fin}
-            onChange={(e) => setFin(e.target.value)}
-          />
-
-          <button className="btn-primary" onClick={crear}>
-            ➕ Crear Iteración
+          <button className="btn" style={{ marginTop: 10 }} onClick={createMicro}>
+            ➕ Crear Microincremento Técnico
           </button>
 
-          <hr style={{ margin: "35px 0", borderColor: "#333" }} />
+          <hr style={{ margin: "25px 0" }} />
 
           {/* LISTA */}
-          {list.map((it) => (
-            <div
-              key={it.id}
-              className="iter-item"
-              onClick={() => (window.location.href = `/iteraciones/${it.id}`)}
-            >
-              <strong style={{ fontSize: 18, color: "#e5d7ff" }}>
-                {it.nombre}
+          {micros.length === 0 && (
+            <p style={{ color: "#c9aaff" }}>Sin microincrementos técnicos</p>
+          )}
+
+          {micros.map((m) => (
+            <div className="micro" key={m.id}>
+              <strong style={{ fontSize: 16, color: "#d5b6ff" }}>
+                {m.title}
               </strong>
-              <br />
-              <small style={{ color: "#bfaaff" }}>{it.objetivo || ""}</small>
-              <br />
-              <span className="status-pill">{it.estado}</span>
+              <p style={{ color: "#cfc3ff" }}>{m.description}</p>
+
+              <label>Progreso: {m.progress}%</label>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={m.progress}
+                onChange={(e) =>
+                  updateProgress(m.id, Number(e.target.value))
+                }
+              />
             </div>
           ))}
         </div>

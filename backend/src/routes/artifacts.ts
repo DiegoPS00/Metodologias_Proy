@@ -21,6 +21,23 @@ routerArtifacts.get("/projects/:id/artifacts", verifyToken, async (req, res) => 
 /* ────────────────────────────────────────────────
    GET ARTIFACTS BY PROJECT + PHASE
 ────────────────────────────────────────────────── */
+routerArtifacts.get("/artifacts/:id/defects/count", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const [rows]: any = await db.query(
+      "SELECT COUNT(*) AS total FROM defects WHERE artifact_id = ?",
+      [id]
+    );
+
+    return res.json(rows[0]);
+
+  } catch (err) {
+    console.error("Error contando defectos:", err);
+    return res.status(500).json({ message: "Error del servidor" });
+  }
+});
+
 routerArtifacts.get(
   "/projects/:id/artifacts/:phase",
   verifyToken,
@@ -35,6 +52,27 @@ routerArtifacts.get(
     res.json(rows);
   }
 );
+// Obtener un artefacto por ID
+routerArtifacts.get("/artifacts/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const [rows]: any = await db.query(
+      "SELECT * FROM artifacts WHERE id = ?",
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "Artifact not found" });
+    }
+
+    return res.json(rows[0]);
+
+  } catch (err) {
+    console.error("Error obteniendo artifact:", err);
+    return res.status(500).json({ message: "Error del servidor" });
+  }
+});
 
 /* ────────────────────────────────────────────────
    CREATE ARTIFACT

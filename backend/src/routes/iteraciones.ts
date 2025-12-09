@@ -70,18 +70,32 @@ routerIteraciones.get("/projects/:id/iteraciones", verifyToken, async (req, res)
 /* ────────────────────────────────────────────────
    OBTENER DETALLE DE UNA ITERACIÓN
 ────────────────────────────────────────────────── */
-routerIteraciones.get("/iteraciones/:itId", verifyToken, async (req, res) => {
-  const { itId } = req.params;
+routerIteraciones.get("/iteraciones/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
 
-  const [[iteracion]]: any = await db.query(
-    "SELECT * FROM iteraciones WHERE id = ?",
-    [itId]
-  );
+    const [rows]: any = await db.query(
+      `
+      SELECT 
+        id, 
+        nombre, 
+        objetivo, 
+        estado,
+        project_id
+      FROM iteraciones
+      WHERE id = ?
+      `,
+      [id]
+    );
 
-  const [micro]: any = await db.query(
-    "SELECT * FROM iteracion_microtasks WHERE iteracion_id = ? ORDER BY fecha DESC",
-    [itId]
-  );
+    if (rows.length === 0)
+      return res.status(404).json({ message: "Iteración no encontrada" });
 
-  res.json({ iteracion, micro });
+    return res.json(rows[0]);
+
+  } catch (err) {
+    console.error("Error obteniendo iteración:", err);
+    return res.status(500).json({ message: "Error del servidor" });
+  }
 });
+
